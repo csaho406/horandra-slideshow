@@ -206,21 +206,29 @@
   });
 
   track.addEventListener('touchend', (e) => {
-    const touchEndX = e.changedTouches[0].clientX;
-    const deltaX = touchEndX - touchStartX;
-    const deltaTime = Date.now() - touchStartTime;
+  const touchEndX = e.changedTouches[0].clientX;
+  const deltaX = touchEndX - touchStartX;
+  const deltaTime = Date.now() - touchStartTime;
 
-    const velocity = deltaX / deltaTime;
+  const speed = Math.abs(deltaX) / deltaTime; // px/ms
 
-    // csak ha elég gyors és elég hosszú volt a mozdulat
-    if (Math.abs(deltaX) > 50 && deltaTime < 300) {
-      if (deltaX < 0) {
-        scrollNext();
-      } else {
-        scrollPrev();
-      }
+  // ha csak hozzáért, akkor nem léptetünk
+  if (Math.abs(deltaX) < 50 || deltaTime > 500) return;
+
+  const direction = deltaX < 0 ? 'next' : 'prev';
+
+  // hány slide-ot lépjünk (max 5)
+  const steps = Math.min(5, Math.max(1, Math.floor(Math.abs(deltaX) / 100)));
+
+  for (let i = 0; i < steps; i++) {
+    if (direction === 'next') {
+      setTimeout(scrollNext, i * 100); // gyors egymás után
+    } else {
+      setTimeout(scrollPrev, i * 100);
     }
-  });
+  }
+});
+
 </script>
 </body>
 </html>
