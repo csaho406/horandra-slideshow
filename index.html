@@ -213,7 +213,7 @@
     const velocity = deltaX / deltaTime;
 
     // csak ha elég gyors és elég hosszú volt a mozdulat
-    if (Math.abs(deltaX) > 30 && Math.abs(velocity) > 0.3) {
+    if (Math.abs(deltaX) > 50 && deltaTime < 300) {
       if (deltaX < 0) {
         scrollNext();
       } else {
