@@ -136,28 +136,75 @@
   <script>
   const track = document.getElementById('track');
   const interval = 3500;
-  let currentOffset = 0;
+  let isTransitioning = false;
 
   function scrollNext() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
     const firstSlide = track.children[0];
     const slideWidth = Math.round(firstSlide.offsetWidth + 10);
 
-    currentOffset += slideWidth;
     track.style.transition = 'transform 1s ease-in-out';
-    track.style.transform = `translateX(-${currentOffset}px)`;
+    track.style.transform = `translateX(-${slideWidth}px)`;
 
     setTimeout(() => {
-      // Mozgatás után a DOM-ból kivesszük az első elemet és a végére tesszük
-      track.appendChild(firstSlide);
-
-      // Az eltolást korrigáljuk, hogy ne ugorjon vissza (vizuálisan stabil marad)
-      currentOffset -= slideWidth;
       track.style.transition = 'none';
-      track.style.transform = `translateX(-${currentOffset}px)`;
+      track.style.transform = 'translateX(0)';
+      track.appendChild(firstSlide);
+      isTransitioning = false;
+    }, 1000);
+  }
+
+  function scrollPrev() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
+    const lastSlide = track.lastElementChild;
+    const slideWidth = Math.round(lastSlide.offsetWidth + 10);
+
+    // Előkészítés: a végéről előre rakjuk
+    track.insertBefore(lastSlide, track.firstChild);
+    track.style.transition = 'none';
+    track.style.transform = `translateX(-${slideWidth}px)`;
+
+    // Majd visszatoljuk nullára
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        track.style.transition = 'transform 1s ease-in-out';
+        track.style.transform = 'translateX(0)';
+      });
+    });
+
+    setTimeout(() => {
+      isTransitioning = false;
     }, 1000);
   }
 
   setInterval(scrollNext, interval);
+
+  // 👇 Touch-swipe logika
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+
+  track.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].clientX;
+    handleSwipe();
+  });
+
+  function handleSwipe() {
+    const threshold = 50; // minimális elmozdulás pixelben
+    const deltaX = touchEndX - touchStartX;
+    if (deltaX > threshold) {
+      scrollPrev();
+    } else if (deltaX < -threshold) {
+      scrollNext();
+    }
+  }
 </script>
 </body>
 </html>
