@@ -135,8 +135,9 @@
 
   <script>
   const track = document.getElementById('track');
-  const interval = 3500;
+  let autoScrollInterval = null;
   let isTransitioning = false;
+  let pauseTimeout = null;
 
   function scrollNext() {
     if (isTransitioning) return;
@@ -163,12 +164,10 @@
     const lastSlide = track.lastElementChild;
     const slideWidth = Math.round(lastSlide.offsetWidth + 10);
 
-    // Előkészítés: a végéről előre rakjuk
     track.insertBefore(lastSlide, track.firstChild);
     track.style.transition = 'none';
     track.style.transform = `translateX(-${slideWidth}px)`;
 
-    // Majd visszatoljuk nullára
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         track.style.transition = 'transform 1s ease-in-out';
@@ -181,30 +180,47 @@
     }, 1000);
   }
 
-  setInterval(scrollNext, interval);
+  function startAutoScroll() {
+    if (autoScrollInterval) clearInterval(autoScrollInterval);
+    autoScrollInterval = setInterval(scrollNext, 2000);
+  }
 
-  // 👇 Touch-swipe logika
+  function pauseAutoScroll(duration = 6000) {
+    if (autoScrollInterval) clearInterval(autoScrollInterval);
+    if (pauseTimeout) clearTimeout(pauseTimeout);
+    pauseTimeout = setTimeout(() => {
+      startAutoScroll();
+    }, duration);
+  }
+
+  startAutoScroll();
+
+  // Touch lendület logika
   let touchStartX = 0;
-  let touchEndX = 0;
+  let touchStartTime = 0;
 
   track.addEventListener('touchstart', (e) => {
     touchStartX = e.touches[0].clientX;
+    touchStartTime = Date.now();
+    pauseAutoScroll(); // 👈 6 másodperces szünet
   });
 
   track.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].clientX;
-    handleSwipe();
-  });
-
-  function handleSwipe() {
-    const threshold = 50; // minimális elmozdulás pixelben
+    const touchEndX = e.changedTouches[0].clientX;
     const deltaX = touchEndX - touchStartX;
-    if (deltaX > threshold) {
-      scrollPrev();
-    } else if (deltaX < -threshold) {
-      scrollNext();
+    const deltaTime = Date.now() - touchStartTime;
+
+    const velocity = deltaX / deltaTime;
+
+    // csak ha elég gyors és elég hosszú volt a mozdulat
+    if (Math.abs(deltaX) > 30 && Math.abs(velocity) > 0.3) {
+      if (deltaX < 0) {
+        scrollNext();
+      } else {
+        scrollPrev();
+      }
     }
-  }
+  });
 </script>
 </body>
 </html>
