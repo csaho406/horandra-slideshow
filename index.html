@@ -51,6 +51,14 @@
     cursor: pointer;
     margin-top: 0;
     box-sizing: border-box;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .slide:hover .buy-button {
+    /* hoverre jelenik meg */
+    opacity: 1;
+    pointer-events: all;
   }
   .buy-button:hover {
     background: #2fa0c6;
