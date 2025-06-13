@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .slideshow {
+      width: 100%;
+      max-width: 100%;
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+    .slideshow-track {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    .slide {
+      flex-shrink: 0;
+      width: auto;
+      height: 200px;
+      margin-right: 10px;
+    }
+    .slide img {
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="slideshow">
+    <div class="slideshow-track" id="track">
+      <!-- képek -->
+      <div class="slide"><img src="https://www.horandrashop.hu/custom/horandrashop/image/data/product/20250601_111610.webp" alt=""></div>
+      <div class="slide"><img src="https://www.horandrashop.hu/custom/horandrashop/image/data/product/20250601_112731.webp" alt=""></div>
+      <div class="slide"><img src="https://www.horandrashop.hu/custom/horandrashop/image/data/product/20250601_114846.webp" alt=""></div>
+      <div class="slide"><img src="https://www.horandrashop.hu/custom/horandrashop/image/data/product/20250601_120033.webp" alt=""></div>
+      <div class="slide"><img src="https://www.horandrashop.hu/custom/horandrashop/image/data/product/20250601_121614.webp" alt=""></div>
+    </div>
+  </div>
+
+  <script>
+    const track = document.getElementById('track');
+    const interval = 2000;
+
+    function scrollNext() {
+      const firstSlide = track.children[0];
+      const slideWidth = firstSlide.offsetWidth + 10; // 10px margin-right
+
+      // Gördülés
+      track.style.transition = 'transform 0.5s ease';
+      track.style.transform = `translateX(-${slideWidth}px)`;
+
+      setTimeout(() => {
+        // Gördülés befejezése után visszaállítás
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0)';
+
+        // Első slide áthelyezése a sor végére
+        track.appendChild(firstSlide);
+      }, 500);
+    }
+
+    setInterval(scrollNext, interval);
+  </script>
+</body>
+</html>
