@@ -134,24 +134,30 @@
   </div>
 
   <script>
-    const track = document.getElementById('track');
-    const interval = 3500;
+  const track = document.getElementById('track');
+  const interval = 3500;
+  let currentOffset = 0;
 
-    function scrollNext() {
-      const firstSlide = track.children[0];
-      const slideWidth = Math.round(firstSlide.offsetWidth + 10);
+  function scrollNext() {
+    const firstSlide = track.children[0];
+    const slideWidth = Math.round(firstSlide.offsetWidth + 10);
 
-      track.style.transition = 'transform 1s ease-in-out';
-      track.style.transform = `translateX(-${slideWidth}px)`;
+    currentOffset += slideWidth;
+    track.style.transition = 'transform 1s ease-in-out';
+    track.style.transform = `translateX(-${currentOffset}px)`;
 
-      setTimeout(() => {
-  track.style.transition = 'none';
-  track.style.transform = 'translateX(0)';
-  track.appendChild(firstSlide);
-}, 1000);
-}
+    setTimeout(() => {
+      // Mozgatás után a DOM-ból kivesszük az első elemet és a végére tesszük
+      track.appendChild(firstSlide);
 
-    setInterval(scrollNext, interval);
-  </script>
+      // Az eltolást korrigáljuk, hogy ne ugorjon vissza (vizuálisan stabil marad)
+      currentOffset -= slideWidth;
+      track.style.transition = 'none';
+      track.style.transform = `translateX(-${currentOffset}px)`;
+    }, 1000);
+  }
+
+  setInterval(scrollNext, interval);
+</script>
 </body>
 </html>
