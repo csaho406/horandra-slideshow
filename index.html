@@ -139,7 +139,7 @@
 
     function scrollNext() {
       const firstSlide = track.children[0];
-      const slideWidth = firstSlide.offsetWidth + 10;
+      const slideWidth = Math.round(firstSlide.offsetWidth + 10);
 
       track.style.transition = 'transform 1s ease-in-out';
       track.style.transform = `translateX(-${slideWidth}px)`;
